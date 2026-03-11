@@ -161,32 +161,44 @@ router.get("/webhook", (req, res) => {
   }
 });
 
-// POST /api/whatsapp/webhook - Webhook for external WhatsApp API (if needed)
+// POST /api/whatsapp/webhook
 router.post("/webhook", async (req, res) => {
   try {
-    // This endpoint can be used with WhatsApp Business API webhooks
-    // For whatsapp-web.js, we use event listeners instead
-    const { from, body } = req.body;
+    // Meta විසින් එවන දත්ත ව්‍යුහය (Deeply nested JSON)
+    const entry = req.body.entry?.[0];
+    const changes = entry?.changes?.[0];
+    const value = changes?.value;
+    const message = value?.messages?.[0];
 
-    if (!from || !body) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid webhook payload",
-      });
+    // පණිවිඩයක් නොමැති නම් (Status update එකක් විය හැක), 200 දී අවසන් කරන්න
+    if (!message) {
+      return res.status(200).send("NOT_A_MESSAGE");
     }
 
-    // Process the message
+    const from = message.from; // Sender's phone number
+    const body = message.text?.body; // The actual message text
+
+    if (!from || !body) {
+      return res.status(200).send("INVALID_PAYLOAD");
+    }
+
+    console.log(`📩 Message from ${from}: ${body}`);
+
+    // AI හරහා පිළිතුර සැකසීම
     const response = await whatsappAIService.processMessage(body, from);
 
-    // Send response back
+    // පිළිතුර WhatsApp හරහා යැවීම
     await whatsappService.sendMessage(from, response);
 
-    res.json({
+    // Meta වෙත සාර්ථක පණිවිඩයක් යැවීම (වැදගත්!)
+    res.status(200).json({
       success: true,
       message: "Webhook processed successfully",
     });
   } catch (error) {
-    console.error("Error processing webhook:", error);
+    console.error("❌ Error processing webhook:", error);
+    // වැරදීමකදී වුවද Meta වෙත 200 හෝ 500 ලබා දිය යුතුය.
+    // 400 ලබා දුන් විට Meta සිතන්නේ ඔබේ URL එක වැරදි බවයි.
     res.status(500).json({
       success: false,
       message: "Failed to process webhook",
