@@ -1,0 +1,39 @@
+{
+  "name": "educonnect-backend",
+  "version": "1.0.0",
+  "description": "EduConnect CRM Backend API",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20.x"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "seed": "node src/utils/seed.js",
+    "test:whatsapp": "node test-whatsapp.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@langchain/community": "^0.3.16",
+    "@langchain/core": "^0.3.20",
+    "@langchain/google-genai": "^0.1.4",
+    "@langchain/pinecone": "^0.1.3",
+    "@pinecone-database/pinecone": "^7.1.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "googleapis": "^126.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "langchain": "^0.3.6",
+    "mongoose": "^8.9.5",
+    "multer": "^1.4.5-lts.1",
+    "pdf-parse": "1.1.1",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.23.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
