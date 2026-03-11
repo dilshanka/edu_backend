@@ -14,7 +14,7 @@ async function getSettings() {
 
 async function initGemini(apiKey) {
   genAI = new GoogleGenerativeAI(apiKey);
-  embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+  embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-001" });
 }
 
 async function initPinecone(apiKey) {
