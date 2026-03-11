@@ -5,6 +5,7 @@ const auth = require("../middleware/auth");
 
 const router = express.Router();
 
+
 // GET /api/students
 router.get("/", auth, async (req, res) => {
   try {
