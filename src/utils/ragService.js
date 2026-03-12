@@ -33,14 +33,22 @@ async function initPinecone(apiKey) {
 // }
 
 async function getEmbedding(text) {
- const settings = await getSettings();
- if (!genAI) {
- await initGemini(settings.geminiApiKey);
- }
- const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
- const result = await model.embedContent(text);
- return result.embedding.values;
+  const settings = await getSettings();
+  if (!genAI) {
+    await initGemini(settings.geminiApiKey);
+  }
+
+  // මෙතැනදී apiVersion එක "v1" ලෙස ලබා දීම අනිවාර්ය වේ
+  const model = genAI.getGenerativeModel(
+    { model: "text-embedding-004" },
+    { apiVersion: "v1" } // මෙම පේළිය එක් කරන්න
+  );
+
+  const result = await model.embedContent(text);
+  return result.embedding.values;
 }
+
+
 
 async function getPineconeIndex() {
   const settings = await getSettings();

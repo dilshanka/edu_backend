@@ -36,6 +36,7 @@ async function initializeLangChain() {
     embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: settings.geminiApiKey,
       modelName: "text-embedding-004",
+      apiVersion: "v1",
     });
 
     // Initialize Pinecone
