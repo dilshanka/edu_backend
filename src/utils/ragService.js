@@ -22,14 +22,24 @@ async function initPinecone(apiKey) {
   pinecone = new Pinecone({ apiKey });
 }
 
-async function getEmbedding(text) {
-  const settings = await getSettings();
-  if (!genAI || !embeddingModel) {
-    await initGemini(settings.geminiApiKey);
-  }
+// async function getEmbedding(text) {
+//   const settings = await getSettings();
+//   if (!genAI || !embeddingModel) {
+//     await initGemini(settings.geminiApiKey);
+//   }
 
-  const result = await genAI.embedContent({ content: { parts: [{ text }] } });
-  return result.embedding.values;
+//   const result = await embeddingModel.embedContent(text);
+//   return result.embedding.values;
+// }
+
+async function getEmbedding(text) {
+ const settings = await getSettings();
+ if (!genAI) {
+ await initGemini(settings.geminiApiKey);
+ }
+ const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+ const result = await model.embedContent(text);
+ return result.embedding.values;
 }
 
 async function getPineconeIndex() {
