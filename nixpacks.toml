@@ -1,8 +1,2 @@
 [phases.setup]
-nixPkgs = ["nodejs_18"]
-
-[phases.install]
-cmds = ["npm install"]
-
-[start]
-cmd = "npm start"
+nixPkgs = ["...", "chromium", "glib", "nss", "nspr", "atk", "at-spi2-atk", "libdrm", "mesa", "dbus", "libxkbcommon", "pango", "cairo", "libxcb"]

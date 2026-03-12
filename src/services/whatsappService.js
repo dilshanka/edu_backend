@@ -13,24 +13,48 @@ function initializeWhatsAppClient() {
     return whatsappClient;
   }
 
+  // whatsappClient = new Client({
+
+
+  //   authStrategy: new LocalAuth({
+  //     dataPath: "./whatsapp-session",
+  //   }),
+  //   puppeteer: {
+  //     headless: true,
+  //     args: [
+  //       "--no-sandbox",
+  //       "--disable-setuid-sandbox",
+  //       "--disable-dev-shm-usage",
+  //       "--disable-accelerated-2d-canvas",
+  //       "--no-first-run",
+  //       "--no-zygote",
+  //       "--single-process",
+  //       "--disable-gpu",
+  //     ],
+  //   },
+  // });
+
+
   whatsappClient = new Client({
     authStrategy: new LocalAuth({
-      dataPath: "./whatsapp-session",
+        dataPath: "./whatsapp-session",
     }),
     puppeteer: {
-      headless: true,
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-accelerated-2d-canvas",
-        "--no-first-run",
-        "--no-zygote",
-        "--single-process",
-        "--disable-gpu",
-      ],
+        headless: true,
+        // Railway වලදී අනිවාර්යයෙන්ම පහත පේළිය එක් කරන්න
+        executablePath: '/usr/bin/google-chrome-stable' || '/usr/bin/chromium-browser',
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-accelerated-2d-canvas",
+            "--no-first-run",
+            "--no-zygote",
+            "--single-process", // මෙය Railway වල memory කළමනාකරණයට උදව් වේ
+            "--disable-gpu",
+        ],
     },
-  });
+});
 
   setupEventHandlers();
   isInitialized = true;
