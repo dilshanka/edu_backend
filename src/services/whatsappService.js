@@ -39,12 +39,111 @@ function initializeWhatsAppClient() {
 }
 
 // Setup event handlers
+// function setupEventHandlers() {
+//   // QR Code event
+//   whatsappClient.on("qr", (qr) => {
+//     console.log("\n🔐 Scan this QR code with WhatsApp:");
+//     qrcode.generate(qr, { small: true });
+//     console.log("\n📱 Open WhatsApp > Linked Devices > Link a Device");
+//   });
+
+//   // Ready event
+//   whatsappClient.on("ready", () => {
+//     console.log("✅ WhatsApp AI Agent is ready!");
+//     isReady = true;
+//   });
+
+//   // Authentication events
+//   whatsappClient.on("authenticated", () => {
+//     console.log("✅ WhatsApp authenticated successfully");
+//   });
+
+//   whatsappClient.on("auth_failure", (msg) => {
+//     console.error("❌ WhatsApp authentication failed:", msg);
+//     isReady = false;
+//   });
+
+//   // Disconnected event
+//   whatsappClient.on("disconnected", (reason) => {
+//     console.log("⚠️ WhatsApp client disconnected:", reason);
+//     isReady = false;
+//   });
+
+//   // Message event - Handle incoming messages
+//   whatsappClient.on("message", async (message) => {
+//     try {
+//       // Ignore group messages (optional - remove this if you want group support)
+//       const chat = await message.getChat();
+//       if (chat.isGroup) {
+//         return;
+//       }
+
+//       // Ignore messages from self
+//       if (message.fromMe) {
+//         return;
+//       }
+
+//       // Get contact info
+//       const contact = await message.getContact();
+//       const userName = contact.pushname || contact.number;
+
+//       console.log(`📩 Message from ${userName}: ${message.body}`);
+
+//       // Show typing indicator
+//       chat.sendStateTyping();
+
+//       // Process message with AI
+//       const response = await whatsappAIService.processMessage(
+//         message.body,
+//         message.from,
+//         userName
+//       );
+
+//       // Clear typing indicator
+//       chat.clearState();
+
+//       // Send response
+//       await message.reply(response);
+
+//       console.log(`✅ Reply sent to ${userName}`);
+//     } catch (error) {
+//       console.error("Error handling message:", error);
+//       try {
+//         await message.reply(
+//           "Sorry, I encountered an error processing your message. Please try again."
+//         );
+//       } catch (replyError) {
+//         console.error("Error sending error message:", replyError);
+//       }
+//     }
+//   });
+
+//   // Message creation event (for debugging)
+//   whatsappClient.on("message_create", (message) => {
+//     if (message.fromMe) {
+//       console.log(`📤 Bot sent: ${message.body}`);
+//     }
+//   });
+
+//   // Loading screen event
+//   whatsappClient.on("loading_screen", (percent, message) => {
+//     console.log(`⏳ Loading WhatsApp... ${percent}% - ${message}`);
+//   });
+// }
+
 function setupEventHandlers() {
-  // QR Code event
+  // QR Code event - මෙතැනදී අපි URL එකක් ලෙස QR එක පෙන්වමු
   whatsappClient.on("qr", (qr) => {
-    console.log("\n🔐 Scan this QR code with WhatsApp:");
+    console.log("\n🔐 QR CODE RECEIVED!");
+    
+    // 1. Terminal එකේ QR එක පෙන්වීමට උත්සාහ කරයි (සමහර විට Railway වල නොපෙනේ)
     qrcode.generate(qr, { small: true });
-    console.log("\n📱 Open WhatsApp > Linked Devices > Link a Device");
+
+    // 2. මෙම ලින්ක් එක Railway Logs වල පෙනේවි. එය කොපි කර බ්‍රවුසරයේ විවෘත කරන්න.
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`;
+    console.log("\n📱 SCAN THE QR CODE HERE:");
+    console.log(qrUrl);
+    console.log("\n📱 Open WhatsApp > Linked Devices > Link a Device\n");
   });
 
   // Ready event
@@ -72,56 +171,34 @@ function setupEventHandlers() {
   // Message event - Handle incoming messages
   whatsappClient.on("message", async (message) => {
     try {
-      // Ignore group messages (optional - remove this if you want group support)
       const chat = await message.getChat();
-      if (chat.isGroup) {
-        return;
-      }
+      if (chat.isGroup || message.fromMe) return;
 
-      // Ignore messages from self
-      if (message.fromMe) {
-        return;
-      }
-
-      // Get contact info
       const contact = await message.getContact();
       const userName = contact.pushname || contact.number;
 
       console.log(`📩 Message from ${userName}: ${message.body}`);
 
-      // Show typing indicator
       chat.sendStateTyping();
 
-      // Process message with AI
+      // AI එක හරහා පිළිතුර සකසයි
       const response = await whatsappAIService.processMessage(
         message.body,
         message.from,
         userName
       );
 
-      // Clear typing indicator
       chat.clearState();
-
-      // Send response
       await message.reply(response);
 
       console.log(`✅ Reply sent to ${userName}`);
     } catch (error) {
       console.error("Error handling message:", error);
       try {
-        await message.reply(
-          "Sorry, I encountered an error processing your message. Please try again."
-        );
+        await message.reply("පද්ධතියේ දෝෂයක් පවතී. කරුණාකර පසුව උත්සාහ කරන්න.");
       } catch (replyError) {
         console.error("Error sending error message:", replyError);
       }
-    }
-  });
-
-  // Message creation event (for debugging)
-  whatsappClient.on("message_create", (message) => {
-    if (message.fromMe) {
-      console.log(`📤 Bot sent: ${message.body}`);
     }
   });
 
