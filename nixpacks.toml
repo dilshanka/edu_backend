@@ -1,6 +1,7 @@
 [phases.setup]
-nixPkgs = ["...", "nodejs", "chromium"]
+nixPkgs = ["...", "nodejs", "chromium", "google-chrome-stable"]
 
 [variables]
 PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
-PUPPETEER_EXECUTABLE_PATH = "/usr/bin/chromium"
+# මෙතැන අගය පසුවට භාවිතා කිරීමට
+PUPPETEER_EXECUTABLE_PATH = "/usr/bin/google-chrome-stable"

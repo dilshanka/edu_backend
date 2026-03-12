@@ -33,40 +33,31 @@ function initializeWhatsAppClient() {
   //   },
   // });
 
-  whatsappClient = new Client({
-    authStrategy: new LocalAuth({
-      dataPath: "./whatsapp-session",
-    }),
-    // puppeteer: {
-    //     headless: true,
-    //     // Railway වලදී අනිවාර්යයෙන්ම පහත පේළිය එක් කරන්න
-    //     executablePath: '/usr/bin/google-chrome-stable' || '/usr/bin/chromium-browser',
-    //     args: [
-    //         "--no-sandbox",
-    //         "--disable-setuid-sandbox",
-    //         "--disable-dev-shm-usage",
-    //         "--disable-accelerated-2d-canvas",
-    //         "--no-first-run",
-    //         "--no-zygote",
-    //         "--single-process", // මෙය Railway වල memory කළමනාකරණයට උදව් වේ
-    //         "--disable-gpu",
-    //     ],
-    // },
-    puppeteer: {
-      headless: true,
-      // Railway/Nixpacks වල සාමාන්‍යයෙන් chromium පවතින්නේ මෙම ස්ථානයේයි
-      executablePath:
-        process.env.PUPPETEER_EXECUTABLE_PATH ||
-        "/usr/bin/chromium" ||
-        "/usr/bin/google-chrome-stable",
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-      ],
-    },
-  });
+  // බ්‍රවුසරය තිබිය හැකි ස්ථාන කිහිපයක් පරීක්ෂා කරන්න
+const getExecutablePath = () => {
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) return process.env.PUPPETEER_EXECUTABLE_PATH;
+  if (process.platform === 'linux') return '/usr/bin/google-chrome-stable';
+  return null; // Local machine එකේදී default එක පාවිච්චි කිරීමට
+};
+
+whatsappClient = new Client({
+  authStrategy: new LocalAuth({
+    dataPath: "./whatsapp-session",
+  }),
+  puppeteer: {
+    headless: true,
+    executablePath: getExecutablePath(),
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--single-process"
+    ],
+  },
+});
+
+ 
 
   setupEventHandlers();
   isInitialized = true;
