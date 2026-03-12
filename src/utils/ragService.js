@@ -28,7 +28,7 @@ async function getEmbedding(text) {
     await initGemini(settings.geminiApiKey);
   }
 
-  const result = await embeddingModel.embedContent(text);
+  const result = await genAI.embedContent({ content: { parts: [{ text }] } });
   return result.embedding.values;
 }
 
