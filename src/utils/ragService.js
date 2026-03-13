@@ -14,8 +14,9 @@ async function getSettings() {
 
 async function initGemini(apiKey) {
   genAI = new GoogleGenerativeAI(apiKey);
-  embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+  embeddingModel = genAI.getGenerativeModel({ model: "embedding-001" });
 }
+
 
 
 async function initPinecone(apiKey) {
@@ -32,21 +33,41 @@ async function initPinecone(apiKey) {
 //   return result.embedding.values;
 // }
 
+// src/utils/ragService.js
+
 async function getEmbedding(text) {
-  const settings = await getSettings();
-  if (!genAI) {
-    await initGemini(settings.geminiApiKey);
+  try {
+    const settings = await getSettings();
+    if (!genAI) {
+      await initGemini(settings.geminiApiKey);
+    }
+
+    // වඩාත්ම සාර්ථක ක්‍රමය: නම කෙලින්ම models/ ලෙස ලබා දීම
+    const model = genAI.getGenerativeModel({ model: "models/text-embedding-004" });
+
+    const result = await model.embedContent(text);
+    
+    if (result && result.embedding && result.embedding.values) {
+      return result.embedding.values;
+    } else {
+      throw new Error("Invalid response format");
+    }
+  } catch (error) {
+    console.error("❌ Embedding failed for 004, trying 001...");
+    // මෙයත් අසාර්ථක වුවහොත් පමණක් පරණ model එකට යන්න
+    try {
+      const backupModel = genAI.getGenerativeModel({ model: "models/embedding-001" });
+      const backupResult = await backupModel.embedContent(text);
+      return backupResult.embedding.values;
+    } catch (fallbackError) {
+      console.error("❌ All embedding models failed:", fallbackError);
+      throw fallbackError;
+    }
   }
-
-  // මෙතැනදී apiVersion එක "v1" ලෙස ලබා දීම අනිවාර්ය වේ
-  const model = genAI.getGenerativeModel(
-    { model: "text-embedding-004" },
-    { apiVersion: "v1" } // මෙම පේළිය එක් කරන්න
-  );
-
-  const result = await model.embedContent(text);
-  return result.embedding.values;
 }
+
+
+
 
 
 

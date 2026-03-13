@@ -7,6 +7,7 @@ const Student = require("../models/Student");
 const ChatMessage = require("../models/Chat");
 const AISetting = require("../models/AISetting");
 
+
 const seedData = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);

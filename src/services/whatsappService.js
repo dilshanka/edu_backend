@@ -6,62 +6,48 @@ let whatsappClient = null;
 let isInitialized = false;
 let isReady = false;
 
-// Initialize WhatsApp Client
+
 function initializeWhatsAppClient() {
   if (whatsappClient) {
     console.log("WhatsApp client already initialized");
     return whatsappClient;
   }
 
-  // whatsappClient = new Client({
+  const getExecutablePath = () => {
+    if (process.env.PUPPETEER_EXECUTABLE_PATH) return process.env.PUPPETEER_EXECUTABLE_PATH;
+    if (process.platform === "linux") return "/usr/bin/google-chrome-stable";
+    return null; 
+  };
 
-  //   authStrategy: new LocalAuth({
-  //     dataPath: "./whatsapp-session",
-  //   }),
-  //   puppeteer: {
-  //     headless: true,
-  //     args: [
-  //       "--no-sandbox",
-  //       "--disable-setuid-sandbox",
-  //       "--disable-dev-shm-usage",
-  //       "--disable-accelerated-2d-canvas",
-  //       "--no-first-run",
-  //       "--no-zygote",
-  //       "--single-process",
-  //       "--disable-gpu",
-  //     ],
-  //   },
-  // });
-
-  // බ්‍රවුසරය තිබිය හැකි ස්ථාන කිහිපයක් පරීක්ෂා කරන්න
-const getExecutablePath = () => {
-  if (process.env.PUPPETEER_EXECUTABLE_PATH) return process.env.PUPPETEER_EXECUTABLE_PATH;
-  if (process.platform === 'linux') return '/usr/bin/google-chrome-stable';
-  return null; // Local machine එකේදී default එක පාවිච්චි කිරීමට
-};
-
-whatsappClient = new Client({
-  authStrategy: new LocalAuth({
-    dataPath: "./whatsapp-session",
-  }),
-  puppeteer: {
-    headless: true,
-    executablePath: getExecutablePath(),
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--single-process"
-    ],
-  },
-});
-
- 
+  whatsappClient = new Client({
+    authStrategy: new LocalAuth({
+      dataPath: "./whatsapp-session", // මෙය "whatsapp-session" ලෙස තිබේදැයි බලන්න
+    }),
+    puppeteer: {
+      headless: process.env.NODE_ENV === 'production' ? true : false, 
+      executablePath: getExecutablePath(),
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--remote-debugging-port=9222",
+      ],
+      authTimeoutMs: 60000, 
+      qrMaxRetries: 5, // මෙතැන කොමාව අනිවාර්යයි
+      handleSIGINT: false,
+      handleSIGTERM: false,
+      handleSIGHUP: false,
+    },
+    // බ්‍රවුසරය වහාම වැසීම වැළැක්වීමට මෙම පේළිය එක් කරන්න
+    webVersionCache: {
+      type: 'remote',
+      remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
+    }
+  });
 
   setupEventHandlers();
   isInitialized = true;
-
   return whatsappClient;
 }
 

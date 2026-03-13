@@ -35,7 +35,7 @@ async function initializeLangChain() {
     // Initialize embeddings
     embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: settings.geminiApiKey,
-      modelName: "text-embedding-004",
+      modelName: "embedding-001",
       apiVersion: "v1",
     });
 
